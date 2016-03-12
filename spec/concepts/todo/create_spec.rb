@@ -3,10 +3,8 @@ require "rails_helper"
 RSpec.describe Todo::Create do
   context "validations" do
     it "should be invalid if the title is empty" do
-      params = { todo: { title: "" } }
-      controller_params = ActionController::Parameters.new(params)
-      todo = Todo::Create.(controller_params)
-      expect(todo.valid?).to be false
+      expect { Todo::Create.(todo: { title: "" }) }
+        .to raise_error Trailblazer::Operation::InvalidContract
     end
   end
 
@@ -14,10 +12,8 @@ RSpec.describe Todo::Create do
     let(:todo_list) { TodoList.new(id: 1, name: "List 1") }
 
     before(:each) do
-      params = { todo: { title: "Todo 1" }, todo_list_id: todo_list.id }
-      controller_params = ActionController::Parameters.new(params)
       expect(TodoList).to receive(:find).with(todo_list.id).and_return(todo_list)
-      @todo = Todo::Create.(controller_params)
+      @todo = Todo::Create.(todo: { title: "Todo 1" }, todo_list_id: todo_list.id)
     end
 
     it_behaves_like "a newly created todo" do
@@ -35,18 +31,14 @@ RSpec.describe Todo::Create do
     end
 
     it "should find or create the default todo list" do
-      params = { todo: { title: "Todo 1" } }
-      controller_params = ActionController::Parameters.new(params)
-      todo = Todo::Create.(controller_params)
+      todo = Todo::Create.(todo: { title: "Todo 1" })
     end
 
     context "current user is present" do
       let(:user) { User.new({ id: 1, fullname: "User 1" }) }
 
       before(:each) do
-        params = { todo: { title: "Todo 1" }, current_user: user }
-        controller_params = ActionController::Parameters.new(params)
-        @todo = Todo::Create.(controller_params)
+        @todo = Todo::Create.(todo: { title: "Todo 1" }, current_user: user)
       end
 
       it "should associate the todo list with the user" do
@@ -68,9 +60,7 @@ RSpec.describe Todo::Create do
 
         before(:each) do
           expect(User).to receive(:find).with(existing_user.id).and_return(existing_user)
-          params = { todo: { title: "Todo 1" }, current_user_id: existing_user.id }
-          controller_params = ActionController::Parameters.new(params)
-          @todo = Todo::Create.(controller_params)
+          @todo = Todo::Create.(todo: { title: "Todo 1" }, current_user_id: existing_user.id)
         end
 
         it "should find the user and associate it with the todo list" do
@@ -90,10 +80,8 @@ RSpec.describe Todo::Create do
         let(:guest_user) { User.new({ id: 3, fullname: "Guest" }) }
 
         before(:each) do
-          params = { todo: { title: 'Todo 1' } }
-          controller_params = ActionController::Parameters.new(params)
           expect(User).to receive(:create!).with(fullname: guest_user.fullname).and_return(guest_user)
-          @todo = Todo::Create.(controller_params)
+          @todo = Todo::Create.(todo: { title: 'Todo 1' })
         end
 
         it "should create the user and associate it with the todo list" do
