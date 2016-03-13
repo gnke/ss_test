@@ -17,6 +17,7 @@ RSpec.describe Todo::Create do
     end
 
     it_behaves_like "a newly created todo" do
+      let(:todo) { @todo }
       let(:list) { todo_list }
     end
   end
@@ -50,6 +51,7 @@ RSpec.describe Todo::Create do
       end
 
       it_behaves_like "a newly created todo" do
+        let(:todo) { @todo }
         let(:list) { default_todo_list }
       end
     end
@@ -72,6 +74,7 @@ RSpec.describe Todo::Create do
         end
 
         it_behaves_like "a newly created todo" do
+          let(:todo) { @todo }
           let(:list) { default_todo_list }
         end
       end
@@ -93,6 +96,7 @@ RSpec.describe Todo::Create do
         end
 
         it_behaves_like "a newly created todo" do
+          let(:todo) { @todo }
           let(:list) { default_todo_list }
         end
       end

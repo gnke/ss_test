@@ -8,14 +8,18 @@ class Todo::Create < Trailblazer::Operation
 
   def process(params)
     validate(params[:todo]) do
-      contract.model.list = get_or_create_todo_list(params)
-      contract.model.list.user = get_or_create_user(params)
-      contract.model.list.save
+      update_todo_list(contract.model, params)
       contract.save
     end
   end
 
   private
+
+  def update_todo_list(todo, params)
+    todo.list = get_or_create_todo_list(params)
+    todo.list.user = get_or_create_user(params)
+    todo.list.save
+  end
 
   def get_or_create_todo_list(params)
     todo_list =
